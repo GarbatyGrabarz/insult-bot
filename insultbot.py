@@ -51,9 +51,9 @@ async def reload_insults(ctx):
         else:
             await ctx.send(f'{n} insults loaded...\nI know Kung Fuck U')
             if platform == "linux" or platform == "linux2":
-			    await ctx.send(file=discord.File(r'media/showme.png'))
-			elif platform == "win32":
-			    await ctx.send(file=discord.File(r'media\showme.png'))
+                await ctx.send(file=discord.File(r'media/showme.png'))
+            elif platform == "win32":
+                await ctx.send(file=discord.File(r'media\showme.png'))
     else:
         pass
 
