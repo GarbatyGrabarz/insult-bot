@@ -3,6 +3,7 @@ import random
 from dotenv import load_dotenv
 from discord.ext import commands
 import discord
+from sys import platform
 
 
 load_dotenv('.env')
@@ -131,4 +132,7 @@ async def on_message(message):
             else:
                 pass
 
-bot.run(os.getenv('BOT_TOKEN'))
+if platform == "linux" or platform == "linux2":
+    bot.run(os.environ.get('BOT_TOKEN'))
+elif platform == "win32":
+    bot.run(os.getenv('BOT_TOKEN'))
