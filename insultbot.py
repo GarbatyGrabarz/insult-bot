@@ -90,7 +90,10 @@ async def info(ctx):
             '!killbot - Shuts down the bot if things get out of hand'),
         inline=False)
 
-    file = discord.File(r'media\info_icon.png')
+    if platform == "linux" or platform == "linux2":
+        file = discord.File(r'media/info_icon.png')
+    elif platform == "win32":
+        file = discord.File(r'media\info_icon.png')
     embed.set_thumbnail(url='attachment://info_icon.png')
 
     await ctx.send(file=file, embed=embed)
