@@ -1,23 +1,28 @@
 import os
 import random
-from dotenv import load_dotenv
-from discord.ext import commands
-import discord
 from sys import platform
+
+from dotenv import load_dotenv  # https://pypi.org/project/dotenv/
+import discord  # https://pypi.org/project/discord.py/
+from discord.ext import commands
 
 
 load_dotenv('.env')
-bot = commands.Bot(command_prefix='!',
-                   description="A bot that hates everyone")
+bot = commands.Bot(
+    command_prefix='!',
+    description="A bot that hates everyone")
 
 
 def LoadInsults():
     with open('insults.txt', 'r') as file:
         lines = file.readlines()
+        lines = [
+            x.replace('\n', '') for x in lines
+            if not x == '\n' and not x.startswith('#')]
     return lines
 
 
-# ------ EVENTS ---------------------------------------------------------------
+# ------ EVENTS ------------------------------------------------------------
 @bot.event
 async def on_ready():
     global insults, prcnt
@@ -36,7 +41,7 @@ async def on_command_error(ctx, error):
         await ctx.send(f'Error: {error}')
 
 
-# ------ ADMIN COMMANDS ------------------------------------------------------
+# ------ ADMIN COMMANDS ----------------------------------------------------
 @bot.command(pass_context=True)
 async def reload_insults(ctx):
     if ctx.message.author.guild_permissions.administrator:
@@ -44,10 +49,7 @@ async def reload_insults(ctx):
         insults = LoadInsults()
         n = len(insults)
         if n == 1:
-            await ctx.send('One insult loaded...\n'
-                           'Creativity is my middle name')
-        elif n < 10:
-            await ctx.send(f'{n} insults loaded...')
+            await ctx.send('One insult loaded...\nI know Kung Fuck U')
         else:
             await ctx.send(f'{n} insults loaded...\nI know Kung Fuck U')
             if platform == "linux" or platform == "linux2":
@@ -55,40 +57,43 @@ async def reload_insults(ctx):
             elif platform == "win32":
                 await ctx.send(file=discord.File(r'media\showme.png'))
     else:
-        pass
+        if platform == "linux" or platform == "linux2":
+            await ctx.send(file=discord.File(r'media/no_power.jpg'))
+        elif platform == "win32":
+            await ctx.send(file=discord.File(r'media\no_power.jpg'))
 
 
-@bot.command(pass_context=True)
-async def killbot(ctx):
-    if ctx.message.author.guild_permissions.administrator:
-        raise SystemExit
-    else:
-        pass
-
-
-# ------ USER COMMANDS -------------------------------------------------------
+# ------ USER COMMANDS -----------------------------------------------------
 @bot.command()
 async def info(ctx):
     global insults, prcnt
-    embed = discord.Embed(title=f"{bot.user.name} info",
-                          color=discord.Color.blue())
-    embed.add_field(name="Loaded insults",
-                    value=f'{len(insults)}',
-                    inline=False)
-    embed.add_field(name="Chance for an insult",
-                    value=f'{prcnt}%',
-                    inline=False)
-    embed.add_field(name="Available commands",
-                    value="""
-                    !chance X - Change the % chance for an insult
-                    !info - Opens this panel
-                    !insult_me - Insult on demand!
-                    """,
-                    inline=False)
-    embed.set_thumbnail(url='https://upload.wikimedia.org/wikipedia/commons'
-                        '/thumb/2/25/Info_icon-72a7cf.svg/'
-                        '1200px-Info_icon-72a7cf.svg.png')
-    await ctx.send(embed=embed)
+    embed = discord.Embed(
+        title=f"{bot.user.name} info",
+        color=discord.Color.blue())
+
+    embed.add_field(
+        name="Loaded insults",
+        value=f'{len(insults)}',
+        inline=False)
+
+    embed.add_field(
+        name="Chance for an insult",
+        value=f'{prcnt}%',
+        inline=False)
+
+    embed.add_field(
+        name="Available commands",
+        value=(
+            '!chance X - Change the % chance for an insult\n'
+            '!info - Opens this panel\n'
+            '!insult_me - Insult on demand!\n'
+            '!killbot - Shuts down the bot if things get out of hand'),
+        inline=False)
+
+    file = discord.File(r'media\info_icon.png')
+    embed.set_thumbnail(url='attachment://info_icon.png')
+
+    await ctx.send(file=file, embed=embed)
 
 
 @bot.command()
@@ -115,7 +120,12 @@ async def chance(ctx, num=1):
     await ctx.send(f'Insult chance changed to {prcnt}%. Good luck!')
 
 
-# ------ RESPONSE ------------------------------------------------------------
+@bot.command()
+async def killbot(ctx):
+    raise SystemExit
+
+
+# ------ RESPONSE ----------------------------------------------------------
 @bot.listen()
 async def on_message(message):
     global insults, prcnt
